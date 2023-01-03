@@ -1,23 +1,26 @@
 package app.project.youbook.services.Implementation;
 
+import app.project.youbook.domain.Role;
+import app.project.youbook.repositories.RoleRepository;
 import app.project.youbook.services.Dto.ResponseDto;
 import app.project.youbook.Enum.UserStatus;
 import app.project.youbook.domain.User;
 import app.project.youbook.repositories.UserRepository;
-import app.project.youbook.services.Dto.UserDto;
 import app.project.youbook.services.UserService;
-import org.apache.tomcat.util.http.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 @Service
 public class UserServiceImp implements UserService {
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    RoleRepository roleRepository;
     @Autowired
     ResponseDto responseDTO;
     @Override
@@ -40,6 +43,21 @@ public class UserServiceImp implements UserService {
             responseDTO.setMessage("All Client information's are mandatory");
             return responseDTO;
         }
+
+        if (!Arrays.toString(UserStatus.values()).contains(user.getStatus().toLowerCase())){
+            responseDTO.setStatus("404");
+            responseDTO.setMessage("Invalid Status");
+            return responseDTO;
+        }
+        if(userRepository.findByEmail(user.getEmail()) != null){
+            responseDTO.setStatus("404");
+            responseDTO.setMessage("Email already exist");
+            return responseDTO;
+        }
+        if (user.getRoles().size() > 0){
+            user.setRoles(getRoles(user.getRoles()));
+        }
+
         userRepository.save(user);
         responseDTO.setStatus("200");
         responseDTO.setMessage("Client has been added successfully");
@@ -115,5 +133,13 @@ public class UserServiceImp implements UserService {
     @Override
     public ResponseDto Delete(Long id) {
         return null;
+    }
+
+    public Set<Role> getRoles(Set<Role> roleList){
+        Set<Role> roles = new HashSet<>();
+        for (Role role : roleList){
+           roles.add(roleRepository.findByName(role.getName()));
+        }
+        return roles;
     }
 }
