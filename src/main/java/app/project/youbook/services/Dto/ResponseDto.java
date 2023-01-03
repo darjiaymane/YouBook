@@ -1,5 +1,6 @@
 package app.project.youbook.services.Dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @NoArgsConstructor
 @Component
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResponseDto {
     private String status;
     private String message;
