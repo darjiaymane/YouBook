@@ -1,4 +1,4 @@
-package app.project.youbook.Dto;
+package app.project.youbook.services.Dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
