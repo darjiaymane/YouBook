@@ -32,11 +32,11 @@ public class User implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "roles_id"))
     private Set<Role> roles = new LinkedHashSet<>();
 
-    public Set<Role> getRoles() {
-        return roles;
-    }
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private Set<Hotel> hotels = new LinkedHashSet<>();
 
-    public void setRoles(Set<Role> roleList) {
-        this.roles = roleList;
-    }
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private Set<Reservation> reservations = new LinkedHashSet<>();
+
+
 }
