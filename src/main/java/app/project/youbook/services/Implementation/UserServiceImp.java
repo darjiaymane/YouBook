@@ -142,4 +142,21 @@ public class UserServiceImp implements UserService {
         }
         return roles;
     }
+    @Override
+    public ResponseDto login(User user){
+        User userToLogin = userRepository.findByEmail(user.getEmail());
+        if(userToLogin == null){
+            responseDTO.setStatus("404");
+            responseDTO.setMessage("Email incorrect");
+            return responseDTO;
+        }
+        if(!userToLogin.getPassword().equals(user.getPassword())){
+            responseDTO.setStatus("404");
+            responseDTO.setMessage("Password Incorrect");
+            return responseDTO;
+        }
+        responseDTO.setStatus("200");
+        responseDTO.setMessage("Welcome "+userToLogin.getUsername());
+        return responseDTO;
+    }
 }

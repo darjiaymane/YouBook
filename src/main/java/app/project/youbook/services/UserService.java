@@ -16,4 +16,5 @@ public interface UserService {
     ResponseDto findByFirstName(String firsName);
     ResponseDto update(User user);
     ResponseDto Delete(Long id);
+    ResponseDto login(User user);
 }
