@@ -3,7 +3,6 @@ package app.project.youbook.controllers;
 import app.project.youbook.domain.User;
 import app.project.youbook.services.Dto.ResponseDto;
 import app.project.youbook.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,8 +23,16 @@ public class UserController {
         return userService.save(user);
     }
 
-    @GetMapping("/user")
-    public ResponseDto findByEmail(@RequestParam(value = "email", defaultValue = "") String email){
-        return userService.findByEmail(email);
+    @GetMapping("/user/")
+    public ResponseDto findByEmailOrUsername(
+            @RequestParam(value = "email", defaultValue = "") String email,
+            @RequestParam(value = "username", defaultValue = "") String username){
+        if (email.isEmpty()){
+            return userService.findByEmail(email);
+        }
+        if (username.isEmpty()){
+            return userService.findByUsername(username);
+        }
+        return new ResponseDto("404", "BadRequest");
     }
 }
