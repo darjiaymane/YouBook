@@ -2,6 +2,7 @@ package app.project.youbook.services.Implementation;
 
 import app.project.youbook.domain.Role;
 import app.project.youbook.repositories.RoleRepository;
+import app.project.youbook.repositories.RoomRepository;
 import app.project.youbook.services.Dto.ResponseDto;
 import app.project.youbook.Enum.UserStatus;
 import app.project.youbook.domain.User;
@@ -23,6 +24,7 @@ public class UserServiceImp implements UserService {
     RoleRepository roleRepository;
     @Autowired
     ResponseDto responseDTO;
+
     @Override
     public ResponseDto findAll(){
         List<User> userList = userRepository.findAll();
@@ -138,7 +140,7 @@ public class UserServiceImp implements UserService {
     public Set<Role> getRoles(Set<Role> roleList){
         Set<Role> roles = new HashSet<>();
         for (Role role : roleList){
-           roles.add(roleRepository.findByName(role.getName()));
+           roles.add(roleRepository.findByName(role.getName().toUpperCase()));
         }
         return roles;
     }
@@ -159,4 +161,10 @@ public class UserServiceImp implements UserService {
         responseDTO.setMessage("Welcome "+userToLogin.getUsername());
         return responseDTO;
     }
+
+    @Override
+    public Role saveRole(Role role){
+        return roleRepository.save(role);
+    }
+
 }
