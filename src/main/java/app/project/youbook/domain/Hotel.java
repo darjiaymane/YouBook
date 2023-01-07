@@ -22,9 +22,10 @@ public class Hotel implements Serializable {
     private String name;
     private String picture;
     private int numberOfRooms;
+    private Boolean status;
 
 
-    @OneToOne(mappedBy = "hotel", orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL)
     private Address address;
 
     @ManyToOne
