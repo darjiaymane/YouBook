@@ -1,6 +1,7 @@
 package app.project.youbook.services;
 
 import app.project.youbook.Enum.UserStatus;
+import app.project.youbook.domain.Role;
 import app.project.youbook.domain.User;
 import app.project.youbook.services.Dto.ResponseDto;
 import org.springframework.stereotype.Service;
@@ -17,4 +18,5 @@ public interface UserService {
     ResponseDto update(User user);
     ResponseDto Delete(Long id);
     ResponseDto login(User user);
+    Role saveRole(Role role);
 }
