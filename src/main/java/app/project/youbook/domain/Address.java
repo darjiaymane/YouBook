@@ -28,16 +28,4 @@ public class Address implements Serializable {
     private String Country;
     @NotNull
     private String city;
-
-    @OneToOne(orphanRemoval = true)
-    @JoinColumn(name = "hotel_id")
-    private Hotel hotel;
-
-    public Hotel getHotel() {
-        return hotel;
-    }
-
-    public void setHotel(Hotel hotel) {
-        this.hotel = hotel;
-    }
 }
