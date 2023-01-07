@@ -23,14 +23,14 @@ public class UserController {
         return userService.save(user);
     }
 
-    @GetMapping("/user/")
+    @GetMapping("/user")
     public ResponseDto findByEmailOrUsername(
             @RequestParam(value = "email", defaultValue = "") String email,
             @RequestParam(value = "username", defaultValue = "") String username){
-        if (email.isEmpty()){
+        if (!email.isEmpty()){
             return userService.findByEmail(email);
         }
-        if (username.isEmpty()){
+        if (!username.isEmpty()){
             return userService.findByUsername(username);
         }
         return new ResponseDto("404", "BadRequest");
