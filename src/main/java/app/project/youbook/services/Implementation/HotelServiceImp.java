@@ -82,22 +82,37 @@ public class HotelServiceImp implements HotelService {
 
     @Transactional
     @Override
-    public ResponseDto update(Hotel hotel){
+    public ResponseDto update(Long id, Hotel hotel){
         if(hotel == null | Objects.equals(hotel, new Hotel())) {
             responseDto.setStatus("400");
             responseDto.setMessage("Hotel cannot be null");
             return responseDto;
         }
-        Optional<Hotel> hotelToUpdate = hotelRepository.findById(hotel.getId());
+
+        Optional<Hotel> hotelToUpdate = hotelRepository.findById(id);
         if(hotelToUpdate.isPresent()){
           hotelToUpdate.get().setName(hotel.getName());
           hotelToUpdate.get().setAddress(hotel.getAddress());
           hotelToUpdate.get().setStatus(hotel.getStatus());
           hotelToUpdate.get().setNumberOfRooms(hotel.getNumberOfRooms());
-            responseDto.setStatus("500");
+            responseDto.setStatus("200");
+            responseDto.setData(hotelToUpdate);
         }
             return responseDto;
 
+    }
+    @Override
+    public void delete(Long id){
+        Optional<Hotel> hotel = hotelRepository.findById(id);
+        hotel.ifPresent(hotelRepository::delete);
+    }
+    @Transactional
+    @Override
+    public ResponseDto updateStatus(Long id, Boolean status){
+            Optional<Hotel> hotel = hotelRepository.findById(id);
+            hotel.ifPresent(hotel1 -> hotel1.setStatus(status));
+            responseDto.setData(hotel);
+            return responseDto;
     }
 
 }
