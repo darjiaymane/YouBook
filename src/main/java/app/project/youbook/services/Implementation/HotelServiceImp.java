@@ -88,7 +88,8 @@ public class HotelServiceImp implements HotelService {
             responseDto.setMessage("Hotel cannot be null");
             return responseDto;
         }
-        Optional<Hotel> hotelToUpdate = hotelRepository.findById(hotel.getId());
+
+        Optional<Hotel> hotelToUpdate = hotelRepository.findById(id);
         if(hotelToUpdate.isPresent()){
           hotelToUpdate.get().setName(hotel.getName());
           hotelToUpdate.get().setAddress(hotel.getAddress());
@@ -99,6 +100,11 @@ public class HotelServiceImp implements HotelService {
         }
             return responseDto;
 
+    }
+    @Override
+    public void delete(Long id){
+        Optional<Hotel> hotel = hotelRepository.findById(id);
+        hotel.ifPresent(hotelRepository::delete);
     }
 
 }
