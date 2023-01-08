@@ -37,5 +37,9 @@ public class AdminController {
         hotelService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
+    @GetMapping("/hotels")
+    public ResponseEntity<ResponseDto> getAllHotels() {
+        ResponseDto hotels = hotelService.findAll();
+        return ResponseEntity.ok(hotels);
+    }
 }
