@@ -19,6 +19,9 @@ public class AdminController {
         this.userService = userService;
     }
 
+    /**
+     *Hotel managements
+     */
     @PostMapping("/hotels")
     public ResponseEntity<ResponseDto> createHotel(@RequestBody Hotel hotel) {
         ResponseDto createdHotel = hotelService.save(hotel);
@@ -42,4 +45,14 @@ public class AdminController {
         ResponseDto hotels = hotelService.findAll();
         return ResponseEntity.ok(hotels);
     }
+
+    @PutMapping("/hotels/{id}/status")
+    public Object updateHotelStatus(@PathVariable Long id, @RequestBody Hotel hotel) {
+        if (hotel != null){
+            ResponseDto updatedHotel = hotelService.updateStatus(id, hotel.getStatus());
+            return ResponseEntity.ok(updatedHotel);
+        }
+        return ResponseEntity.badRequest();
+    }
+
 }

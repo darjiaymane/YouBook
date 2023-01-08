@@ -106,5 +106,13 @@ public class HotelServiceImp implements HotelService {
         Optional<Hotel> hotel = hotelRepository.findById(id);
         hotel.ifPresent(hotelRepository::delete);
     }
+    @Transactional
+    @Override
+    public ResponseDto updateStatus(Long id, Boolean status){
+            Optional<Hotel> hotel = hotelRepository.findById(id);
+            hotel.ifPresent(hotel1 -> hotel1.setStatus(status));
+            responseDto.setData(hotel);
+            return responseDto;
+    }
 
 }

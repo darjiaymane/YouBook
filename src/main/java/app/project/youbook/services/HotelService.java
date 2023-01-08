@@ -15,4 +15,5 @@ public interface HotelService {
     ResponseDto findAllByStatus(Boolean Status);
     ResponseDto update(Long id, Hotel hotel);
     void delete(Long id);
+    ResponseDto updateStatus(Long id, Boolean status);
 }
