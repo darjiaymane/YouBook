@@ -6,9 +6,7 @@ import app.project.youbook.services.HotelService;
 import app.project.youbook.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 
 @RestController
 @RequestMapping("/admin")
@@ -33,4 +31,11 @@ public class AdminController {
         ResponseDto updatedHotel = hotelService.update(id, hotel);
         return ResponseEntity.ok(updatedHotel);
     }
+
+    @DeleteMapping("/hotels/{id}")
+    public ResponseEntity<Void> deleteHotel(@PathVariable Long id) {
+        hotelService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
