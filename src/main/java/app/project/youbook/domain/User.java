@@ -1,5 +1,6 @@
 package app.project.youbook.domain;
 
+import app.project.youbook.Enum.UserStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -31,7 +32,7 @@ public class User implements Serializable {
     private String email;
     private String password;
     //Active - Banned
-    private String status;
+    private UserStatus status;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "user_entity_roles",
