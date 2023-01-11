@@ -1,6 +1,8 @@
 package app.project.youbook.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,11 +29,19 @@ public class Room implements Serializable {
     private Integer capacity;
     private Integer price;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+
+    @ManyToOne
     @JoinColumn(name = "hotel_id")
     private Hotel hotel;
 
     @OneToMany(mappedBy = "room", orphanRemoval = true)
     private Set<Reservation> reservations = new LinkedHashSet<>();
-
+    @JsonIgnore
+    public Hotel getHotel() {
+        return hotel;
+    }
+    @JsonSetter
+    public void setHotel(Hotel hotel) {
+        this.hotel = hotel;
+    }
 }
