@@ -10,13 +10,13 @@ import org.springframework.stereotype.Service;
 public interface UserService {
     ResponseDto findAll();
     ResponseDto save(User user);
-    ResponseDto findByStatus(UserStatus Status);
     ResponseDto findByEmail(String email);
     ResponseDto findByUsername(String username);
     ResponseDto findById(Long id);
     ResponseDto findByFirstName(String firsName);
-    ResponseDto update(User user);
-    ResponseDto Delete(Long id);
+    ResponseDto update(Long id, User user);
     ResponseDto login(User user);
     Role saveRole(Role role);
+    ResponseDto updateStatus(Long id, String status);
+    void delete(Long id);
 }

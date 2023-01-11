@@ -1,5 +1,6 @@
 package app.project.youbook.services.Implementation;
 
+import app.project.youbook.domain.User;
 import app.project.youbook.domain.Role;
 import app.project.youbook.repositories.RoleRepository;
 import app.project.youbook.repositories.RoomRepository;
@@ -46,7 +47,7 @@ public class UserServiceImp implements UserService {
             return responseDTO;
         }
 
-        if (!Arrays.toString(UserStatus.values()).contains(user.getStatus().toLowerCase())){
+        if (!Arrays.toString(UserStatus.values()).contains(user.getStatus().toString().toLowerCase())){
             responseDTO.setStatus("404");
             responseDTO.setMessage("Invalid Status");
             return responseDTO;
@@ -59,7 +60,8 @@ public class UserServiceImp implements UserService {
         if (user.getRoles().size() > 0){
             user.setRoles(getRoles(user.getRoles()));
         }
-
+        UserStatus status = UserStatus.valueOf(user.getStatus().toString().toLowerCase());
+        user.setStatus(status);
         userRepository.save(user);
         responseDTO.setStatus("200");
         responseDTO.setMessage("Client has been added successfully");
@@ -67,18 +69,83 @@ public class UserServiceImp implements UserService {
         return responseDTO;
     }
 
+    @Transactional
     @Override
-    public ResponseDto findByStatus(UserStatus status){
-        User user = userRepository.findByStatus(status);
-        if (user == null){
-            responseDTO.setStatus("200");
-            responseDTO.setMessage("There is no User with this status");
+    public ResponseDto update(Long id, User user) {
+
+        if(user == null | Objects.equals(user, new User())) {
+            responseDTO.setStatus("400");
+            responseDTO.setStatus("400");
+            responseDTO.setMessage("User cannot be null");
             return responseDTO;
         }
+
+        Optional<User> userToUpdate = userRepository.findById(id);
+        if(userToUpdate.isPresent()){
+            userToUpdate.get().setFirstName(user.getFirstName());
+            userToUpdate.get().setLastName(user.getLastName());
+            userToUpdate.get().setUsername(user.getUsername());
+            userToUpdate.get().setEmail(user.getEmail());
+            userToUpdate.get().setPassword(user.getPassword());
+            userToUpdate.get().setStatus(user.getStatus());
+            responseDTO.setStatus("200");
+            responseDTO.setMessage("");
+            responseDTO.setData(userToUpdate);
+        }
+        return responseDTO;
+    }
+    @Override
+    public ResponseDto login(User user){
+        User userToLogin = userRepository.findByEmail(user.getEmail());
+        if(userToLogin == null){
+            responseDTO.setStatus("404");
+            responseDTO.setMessage("Email incorrect");
+            return responseDTO;
+        }
+        if(!userToLogin.getPassword().equals(user.getPassword())){
+            responseDTO.setStatus("404");
+            responseDTO.setMessage("Password Incorrect");
+            return responseDTO;
+        }
+        responseDTO.setStatus("200");
+        responseDTO.setMessage("Welcome "+userToLogin.getUsername());
+        return responseDTO;
+    }
+    @Transactional
+    @Override
+    public ResponseDto updateStatus(Long id, String status){
+        if (!Arrays.toString(UserStatus.values()).contains(status.toLowerCase())){
+            responseDTO.setStatus("404");
+            responseDTO.setMessage("Invalid Status");
+            return responseDTO;
+        }
+        Optional<User> user = userRepository.findById(id);
+        user.ifPresent(userToUpdate -> userToUpdate.setStatus(UserStatus.valueOf(status)));
         responseDTO.setData(user);
         return responseDTO;
     }
 
+    @Override
+    public void delete(Long id) {
+        Optional<User> user = userRepository.findById(id);
+        user.ifPresent(userRepository::delete);
+    }
+
+
+
+
+    @Override
+    public Role saveRole(Role role){
+        return roleRepository.save(role);
+    }
+
+    public Set<Role> getRoles(Set<Role> roleList){
+        Set<Role> roles = new HashSet<>();
+        for (Role role : roleList){
+            roles.add(roleRepository.findByName(role.getName().toUpperCase()));
+        }
+        return roles;
+    }
     @Override
     public ResponseDto findByEmail(String email) {
         User user = userRepository.findByEmail(email);
@@ -126,45 +193,4 @@ public class UserServiceImp implements UserService {
         responseDTO.setData(user);
         return responseDTO;
     }
-    @Transactional
-    @Override
-    public ResponseDto update(User user) {
-        return null;
-    }
-
-    @Override
-    public ResponseDto Delete(Long id) {
-        return null;
-    }
-
-    public Set<Role> getRoles(Set<Role> roleList){
-        Set<Role> roles = new HashSet<>();
-        for (Role role : roleList){
-           roles.add(roleRepository.findByName(role.getName().toUpperCase()));
-        }
-        return roles;
-    }
-    @Override
-    public ResponseDto login(User user){
-        User userToLogin = userRepository.findByEmail(user.getEmail());
-        if(userToLogin == null){
-            responseDTO.setStatus("404");
-            responseDTO.setMessage("Email incorrect");
-            return responseDTO;
-        }
-        if(!userToLogin.getPassword().equals(user.getPassword())){
-            responseDTO.setStatus("404");
-            responseDTO.setMessage("Password Incorrect");
-            return responseDTO;
-        }
-        responseDTO.setStatus("200");
-        responseDTO.setMessage("Welcome "+userToLogin.getUsername());
-        return responseDTO;
-    }
-
-    @Override
-    public Role saveRole(Role role){
-        return roleRepository.save(role);
-    }
-
 }
