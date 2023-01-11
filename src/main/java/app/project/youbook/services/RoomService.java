@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface RoomService {
-    ResponseDto save(Room room);
+    ResponseDto save(Long hotelId, Room room);
     ResponseDto update(Long id, Room room);
     void delete(Long id);
     ResponseDto findAll();

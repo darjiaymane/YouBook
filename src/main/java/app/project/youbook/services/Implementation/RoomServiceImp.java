@@ -2,36 +2,45 @@ package app.project.youbook.services.Implementation;
 
 import app.project.youbook.domain.Hotel;
 import app.project.youbook.domain.Room;
+import app.project.youbook.repositories.HotelRepository;
 import app.project.youbook.repositories.RoomRepository;
 import app.project.youbook.services.Dto.ResponseDto;
 import app.project.youbook.services.RoomService;
+import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Objects;
 import java.util.Optional;
-
+@Service
 public class RoomServiceImp implements RoomService {
 
     private final RoomRepository roomRepository;
+    private final HotelRepository hotelRepository;
     private final ResponseDto responseDto;
 
-    public RoomServiceImp(RoomRepository roomRepository, ResponseDto responseDto) {
+    public RoomServiceImp(RoomRepository roomRepository, HotelRepository hotelRepository, ResponseDto responseDto) {
         this.roomRepository = roomRepository;
+        this.hotelRepository = hotelRepository;
         this.responseDto = responseDto;
     }
 
     @Override
-    public ResponseDto save(Room room) {
+    public ResponseDto save(Long hotelId, Room room) {
         if(room == null | Objects.equals(room, new Room())){
             responseDto.setStatus("404");
             responseDto.setMessage("Room cannot be null");
+            return responseDto;
         }
-        else{
-            roomRepository.save(room);
-            responseDto.setStatus("200");
-            responseDto.setMessage("Room has been added successfully");
-            responseDto.setData(room);
+        Optional<Hotel> hotel = hotelRepository.findById(hotelId);
+        if(hotel.isPresent()){
+        room.setHotel(hotel.get());
+        roomRepository.save(room);
+        responseDto.setStatus("200");
+        responseDto.setMessage("Room has been added successfully");
+        responseDto.setData(room);
+        return responseDto;
         }
+        responseDto.setMessage("Hotel not found");
         return responseDto;
     }
 
@@ -69,13 +78,16 @@ public class RoomServiceImp implements RoomService {
     public ResponseDto findAll() {
 
         responseDto.setData(roomRepository.findAll());
+        responseDto.setMessage(null);
+        responseDto.setStatus(null);
         return responseDto;
     }
 
     @Override
     public ResponseDto findById(Long id) {
-
         responseDto.setData(roomRepository.findById(id));
+        responseDto.setMessage(null);
+        responseDto.setStatus(null);
         return responseDto;
     }
 }
