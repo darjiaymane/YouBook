@@ -34,7 +34,14 @@ public class Reservation implements Serializable {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
+    @JsonIgnore
+    public User getUser() {
+        return user;
+    }
+    @JsonSetter
+    public void setUser(User user) {
+        this.user = user;
+    }
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "room_id")
