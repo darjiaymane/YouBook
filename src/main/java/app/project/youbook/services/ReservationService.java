@@ -1,5 +1,6 @@
 package app.project.youbook.services;
 
+import app.project.youbook.Enum.ReservationStatus;
 import app.project.youbook.domain.Reservation;
 import app.project.youbook.domain.User;
 import app.project.youbook.services.Dto.ResponseDto;
@@ -13,4 +14,5 @@ public interface ReservationService {
     List<Reservation> findAll();
     ResponseDto update(Reservation updatedReservation, Long id);
     void delete(Long id);
+    ResponseDto changeStatus(Long reservation_Id, Reservation status);
 }
