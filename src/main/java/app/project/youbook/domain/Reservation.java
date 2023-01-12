@@ -1,5 +1,6 @@
 package app.project.youbook.domain;
 
+import app.project.youbook.Enum.ReservationStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,7 +25,8 @@ public class Reservation implements Serializable {
     private UUID uuid;
     private Date startDate;
     private Date endDate;
-    private Integer totalPrice;
+    private Double totalPrice;
+    private ReservationStatus status;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
