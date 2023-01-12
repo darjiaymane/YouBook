@@ -14,5 +14,5 @@ public interface ReservationService {
     List<Reservation> findAll();
     ResponseDto update(Reservation updatedReservation, Long id);
     void delete(Long id);
-    ResponseDto changeStatus(Long reservation_Id, ReservationStatus status);
+    ResponseDto changeStatus(Long reservation_Id, Reservation status);
 }
