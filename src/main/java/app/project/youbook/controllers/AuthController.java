@@ -6,7 +6,7 @@ import app.project.youbook.services.UserService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/l")
 public class AuthController {
     final UserService userService;
 
