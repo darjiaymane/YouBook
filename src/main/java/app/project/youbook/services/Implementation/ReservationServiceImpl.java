@@ -38,7 +38,11 @@ public class ReservationServiceImpl implements ReservationService {
 
     public ResponseDto createReservation(Reservation reservation){
         if(reservation != null){
-            if (reservation.getStartDate().after(reservation.getEndDate())) {
+            if (reservation.getStartDate() != null){
+                if (reservation.getStartDate().after(reservation.getEndDate())) {
+                    return new ResponseDto("400", "Invalid start and end date");
+                }
+            }else {
                 return new ResponseDto("400", "Invalid start and end date");
             }
             // set user and room if not set before
@@ -74,9 +78,14 @@ public class ReservationServiceImpl implements ReservationService {
         if (reservation == null){
             return new ResponseDto("400", "Reservation not found");
         }
-        if (updatedReservation.getStartDate().after(updatedReservation.getEndDate())) {
+        if (updatedReservation.getStartDate() != null){
+            if (updatedReservation.getStartDate().after(updatedReservation.getEndDate())) {
+                return new ResponseDto("400", "Invalid start and end date");
+            }
+        }else {
             return new ResponseDto("400", "Invalid start and end date");
         }
+
         if (!checkAvailability(updatedReservation)){
             return new ResponseDto("400", "The room is not available at this time");
         }
