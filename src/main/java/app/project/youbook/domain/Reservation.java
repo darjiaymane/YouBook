@@ -1,7 +1,10 @@
 package app.project.youbook.domain;
 
 import app.project.youbook.Enum.ReservationStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,7 +35,7 @@ public class Reservation implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
 
-
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
