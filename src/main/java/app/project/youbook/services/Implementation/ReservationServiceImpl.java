@@ -1,5 +1,6 @@
 package app.project.youbook.services.Implementation;
 
+import app.project.youbook.Enum.ReservationStatus;
 import app.project.youbook.domain.Reservation;
 import app.project.youbook.repositories.ReservationRepository;
 import app.project.youbook.services.Dto.ResponseDto;
@@ -8,6 +9,7 @@ import app.project.youbook.services.ReservationService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository reservationRepository;
@@ -30,7 +32,6 @@ public class ReservationServiceImpl implements ReservationService {
             if (reservation.getStartDate().after(reservation.getEndDate())) {
                 return new ResponseDto("400", "Invalid start and end date");
             }
-            reservation.setUuid(UUID.randomUUID());
             // set user and room if not set before
             if (reservation.getUser() == null){
                 return new ResponseDto("400", "User id not provided");
@@ -41,6 +42,10 @@ public class ReservationServiceImpl implements ReservationService {
             if (!checkAvailability(reservation)){
                 return new ResponseDto("400", "The room is not available at this time");
             }
+            reservation.setUuid(UUID.randomUUID());
+            Double totalPrice = calculatePrice(reservation);
+            reservation.setTotalPrice(totalPrice);
+            reservation.setStatus(ReservationStatus.PENDING);
             reservationRepository.save(reservation);
             return new ResponseDto("200", "Reservation created successfully", reservation);
         }
@@ -56,20 +61,20 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public ResponseDto update(Reservation updatedReservation, Long id) {
-        Optional<Reservation> reservation = reservationRepository.findById(id);
-        if (!reservation.isPresent()){
+        Reservation reservation = reservationRepository.findById(id).orElse(null);
+        if (reservation == null){
             return new ResponseDto("400", "Reservation not found");
-        }
-        if (!checkAvailability(updatedReservation)){
-            return new ResponseDto("400", "The room is not available at this time");
         }
         if (updatedReservation.getStartDate().after(updatedReservation.getEndDate())) {
             return new ResponseDto("400", "Invalid start and end date");
         }
-        reservation.get().setStartDate(updatedReservation.getStartDate());
-        reservation.get().setEndDate(updatedReservation.getEndDate());
-        reservation.get().setTotalPrice(updatedReservation.getTotalPrice());
-        reservationRepository.save(reservation.get());
+        if (!checkAvailability(updatedReservation)){
+            return new ResponseDto("400", "The room is not available at this time");
+        }
+        reservation.setStartDate(updatedReservation.getStartDate());
+        reservation.setEndDate(updatedReservation.getEndDate());
+        reservation.setTotalPrice(calculatePrice(reservation));
+        reservationRepository.save(reservation);
         return new ResponseDto("200", "Reservation created successfully", reservation);
     }
 
@@ -77,5 +82,23 @@ public class ReservationServiceImpl implements ReservationService {
     public void delete(Long id) {
         Optional<Reservation> reservation = reservationRepository.findById(id);
         reservation.ifPresent(reservationRepository::delete);
+    }
+
+    public Double calculatePrice(Reservation reservation) {
+        long diff = reservation.getEndDate().getTime() - reservation.getStartDate().getTime();
+        long nights = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+        Integer pricePerNight = reservation.getRoom().getPrice();
+        return (double) (nights * pricePerNight);
+    }
+
+    public ResponseDto changeStatus(Long id, ReservationStatus status) {
+        Reservation reservation = reservationRepository.findById(id).orElse(null);
+        if (reservation==null){
+            return new ResponseDto("400", "Reservation not found");
+        }
+        reservation.setStatus(status);
+        reservationRepository.save(reservation);
+        return new ResponseDto("200", "Reservation created successfully", reservation);
+
     }
 }
