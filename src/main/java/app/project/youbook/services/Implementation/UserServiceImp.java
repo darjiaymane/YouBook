@@ -3,28 +3,35 @@ package app.project.youbook.services.Implementation;
 import app.project.youbook.domain.User;
 import app.project.youbook.domain.Role;
 import app.project.youbook.repositories.RoleRepository;
-import app.project.youbook.repositories.RoomRepository;
 import app.project.youbook.services.Dto.ResponseDto;
 import app.project.youbook.Enum.UserStatus;
-import app.project.youbook.domain.User;
 import app.project.youbook.repositories.UserRepository;
 import app.project.youbook.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
-public class UserServiceImp implements UserService {
+public class UserServiceImp implements UserService, UserDetailsService {
     @Autowired
     UserRepository userRepository;
     @Autowired
     RoleRepository roleRepository;
     @Autowired
     ResponseDto responseDTO;
+
+    private final PasswordEncoder passwordEncoder;
+
+    public UserServiceImp(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public ResponseDto findAll(){
@@ -60,6 +67,7 @@ public class UserServiceImp implements UserService {
         if (user.getRoles().size() > 0){
             user.setRoles(getRoles(user.getRoles()));
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         UserStatus status = UserStatus.valueOf(user.getStatus().toString().toLowerCase());
         user.setStatus(status);
         userRepository.save(user);
@@ -192,5 +200,21 @@ public class UserServiceImp implements UserService {
         }
         responseDTO.setData(user);
         return responseDTO;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(username);
+        System.out.println("jfkjfjkdfjkfdjk");
+        if (user == null){
+            throw new UsernameNotFoundException("User not found");
+        }
+        else {
+            Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            for (Role role : user.getRoles()){
+                authorities.add(new SimpleGrantedAuthority(role.getName()));
+            }
+            return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
+        }
     }
 }
