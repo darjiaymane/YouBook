@@ -1,0 +1,73 @@
+@Service
+public class ReservationService {
+    private final ReservationRepository reservationRepository;
+
+    public ReservationService(ReservationRepository reservationRepository) {
+        this.reservationRepository = reservationRepository;
+    }
+
+    public boolean checkAvailability(Reservation reservation) {
+        // Retrieve all reservations for the same room and overlapping dates
+        List<Reservation> reservations = reservationRepository.findByRoomAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+                reservation.getRoom(), reservation.getEndDate(), reservation.getStartDate()
+        );
+
+        return reservations.isEmpty();
+    }
+
+    public void createReservation(Reservation reservation){
+    	// reservation.setUUID(UUID.randomUUID());
+        // set user and room if not set before
+        if (reservation.getUser() == null){
+        	throw new IllegalArgumentException("user id not provided");
+        }
+        if (reservation.getRoom() == null){
+        	throw new IllegalArgumentException("room id not provided");
+        }
+        if (!checkAvailability(reservation)){
+        	throw new IllegalArgumentException("The room is not available at this time");
+        }
+        reservationRepository.save(reservation);
+    }
+    public List<Reservation> getAllReservations() {
+            return reservationRepository.findAll();
+    }
+
+    public Reservation updateReservation(Reservation updatedReservation, Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid reservation id"));
+        reservation.setStartDate(updatedReservation.getStartDate());
+        reservation.setEndDate(updatedReservation.getEndDate());
+        reservation.setTotalPrice(updatedReservation.getTotalPrice());
+        return reservationRepository.save(reservation);
+    }
+
+    public void cancelReservation(Long id) {
+        reservationRepository.deleteById(id);
+    }
+
+    public Reservation updateReservation(Reservation updatedReservation, Long id, User user) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid reservation id"));
+        if (!reservation.getUser().equals(user)) {
+        	throw new IllegalArgumentException("user not authorized");
+        }
+        if (!checkAvailability(updatedReservation)){
+        	throw new IllegalArgumentException("The room is not available at this time");
+        }
+        if (updatedReservation.getStartDate().after(updatedReservation.getEndDate())) {
+        	throw new IllegalArgumentException("Invalid start and end date");
+        }
+        reservation.setStartDate(updatedReservation.getStartDate());
+        reservation.setEndDate(updatedReservation.getEndDate());
+        reservation.setTotalPrice(updatedReservation.getTotalPrice());
+        return reservationRepository.save(reservation);
+    }
+}
+
+
+
+
+
+
+
