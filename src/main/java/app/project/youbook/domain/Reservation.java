@@ -47,4 +47,6 @@ public class Reservation implements Serializable {
     @JoinColumn(name = "room_id")
     private Room room;
 
+
+
 }
